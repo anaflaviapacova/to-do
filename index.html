@@ -3,23 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TASKSDDD</title>
+    <title>Minhas Tarefas - Pink Edition</title>
     <style>
-        .completed { text-decoration: line-through; color: gray; }
+        :root {
+            --bg-page: #fff5f7;
+            --primary-pink: #ffb6c1; /* Light Pink */
+            --dark-pink: #ff8fa3;
+            --accent-pink: #f8bbd0;
+            --text-color: #5d4037;
+            --white: #ffffff;
+            --success: #a5d6a7;
+            --danger: #ef9a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 50px;
+        }
+
+        .container {
+            background-color: var(--white);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.3);
+            border: 2px solid var(--primary-pink);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--dark-pink);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid var(--accent-pink);
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--dark-pink);
+            box-shadow: 0 0 5px rgba(255, 143, 163, 0.3);
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #taskBtn {
+            background-color: var(--dark-pink);
+            color: white;
+        }
+
+        #taskBtn:hover {
+            background-color: #ff758f;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            font-size: 0.8rem;
+            background-color: var(--accent-pink);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-pink);
+        }
+
+        #taskCounter {
+            background-color: var(--bg-page);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark-pink);
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background-color: #fff;
+            border-bottom: 1px solid var(--accent-pink);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        li span {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .completed span {
+            text-decoration: line-through;
+            color: #bcaaa4;
+        }
+
+        .btn-item {
+            background-color: transparent;
+            padding: 5px;
+            font-size: 1.1rem;
+        }
+
+        .btn-edit { color: #fbc02d; }
+        .btn-delete { color: var(--danger); }
+
     </style>
-    <script defer src="script.js"></script>
 </head>
 <body>
-    <h1>Minhas Tarefas</h1>
+
+<div class="container">
+    <h1>🎀 Minhas Tarefas</h1>
     
-    <input type="text" id="taskInput" placeholder="Digite uma tarefa...">
-    <button id="taskBtn">Adicionar</button>
-    <button id="clearAllBtn">Limpar Tudo</button>
-    <button id="clearCompletedBtn">Limpar Concluídas</button>
+    <div class="input-group">
+        <input type="text" id="taskInput" placeholder="O que vamos fazer hoje?">
+        <button id="taskBtn">Adicionar</button>
+    </div>
+
+    <div class="actions-bar">
+        <button id="clearAllBtn" class="btn-secondary">Limpar Tudo</button>
+        <button id="clearCompletedBtn" class="btn-secondary">Limpar Concluídas</button>
+    </div>
 
     <p id="taskCounter">0 de 0 tarefas concluídas</p>
 
     <ul id="taskList">
         </ul>
+</div>
+
+<script>
+    const taskBtn = document.querySelector("#taskBtn");
+    const taskList = document.querySelector("#taskList");
+    const taskInput = document.querySelector("#taskInput");
+    const clearAllBtn = document.querySelector("#clearAllBtn");
+    const clearCompletedBtn = document.querySelector("#clearCompletedBtn");
+    const taskCounter = document.querySelector("#taskCounter");
+
+    function updateCounter() {
+        const totalTasks = document.querySelectorAll("#taskList li").length;
+        const completedTasks = document.querySelectorAll("#taskList li.completed").length;
+        taskCounter.textContent = `${completedTasks} de ${totalTasks} tarefas concluídas`;
+    }
+
+    function addTask() {
+        const taskValue = taskInput.value.trim();
+
+        if (taskValue === '') {
+            alert("Digite algo antes de adicionar!");
+            return;
+        }
+
+        const li = document.createElement('li');
+        
+        const span = document.createElement('span');
+        span.textContent = taskValue;
+        
+        span.addEventListener('click', () => {
+            li.classList.toggle('completed');
+            updateCounter();
+        });
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.className = 'btn-item btn-edit';
+        editBtn.onclick = () => {
+            const newValue = prompt("Editar tarefa:", span.textContent);
+            if (newValue !== null && newValue.trim() !== "") {
+                span.textContent = newValue.trim();
+            }
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑️';
+        deleteBtn.className = 'btn-item btn-delete';
+        deleteBtn.onclick = () => {
+            li.remove();
+            updateCounter();
+        };
+
+        li.appendChild(span);
+        li.appendChild(editBtn);
+        li.appendChild(deleteBtn);
+        taskList.appendChild(li);
+
+        taskInput.value = '';
+        taskInput.focus();
+        updateCounter();
+    }
+
+    taskBtn.addEventListener("click", addTask);
+
+    taskInput.addEventListener("keypress", (e) => {
+        if (e.key === 'Enter') addTask();
+    });
+
+    clearAllBtn.addEventListener("click", () => {
+        if(confirm("Deseja apagar todas as tarefas?")) {
+            taskList.innerHTML = '';
+            updateCounter();
+        }
+    });
+
+    clearCompletedBtn.addEventListener("click", () => {
+        const completedItems = document.querySelectorAll(".completed");
+        completedItems.forEach(item => item.remove());
+        updateCounter();
+    });
+</script>
+
 </body>
 </html>
